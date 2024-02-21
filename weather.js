@@ -1,29 +1,44 @@
 ﻿const application = {
   name: 'OpenWeatherMap API',
-  version: '1.0'
-}
+  version: '1.0',
+};
 
 const tomTom = {
-  key: 'YOUR_API_KEY',
+  key: 'Tsgxuwl2a1qJMDhI3j5rZS9xzsG8UqGF',
   mapPadding: 40,
   map: null,
   popup: null,
-  searchZoom: 11
+  searchZoom: 11,
 };
 
 const openWeatherMap = {
-  appid: 'YOUR_APP_ID',
-  tileUrl: 'https://tile.openweathermap.org/map/{layer}/{z}/{x}/{y}.png?appid={appid}',
+  appid: '6be4c73603d24111b5b1a6972d8bd56d',
+  tileUrl:
+    'https://tile.openweathermap.org/map/{layer}/{z}/{x}/{y}.png?appid=6be4c73603d24111b5b1a6972d8bd56d',
   layer: '',
   layerName: 'owm_layer',
   sourceName: 'owm_source',
-  attribution:  'OpenWeatherMap.org',
+  attribution: 'OpenWeatherMap.org',
   units: 'imperial',
   directions: [
-   'N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE',
-   'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'
+    'N',
+    'NNE',
+    'NE',
+    'ENE',
+    'E',
+    'ESE',
+    'SE',
+    'SSE',
+    'S',
+    'SSW',
+    'SW',
+    'WSW',
+    'W',
+    'WNW',
+    'NW',
+    'NNW',
   ],
-  maxDegree: 360
+  maxDegree: 360,
 };
 
 const ids = {
@@ -31,8 +46,8 @@ const ids = {
     map: 'map',
     location: 'location',
     imperial: 'imperial',
-    metric: 'metric'
-  }
+    metric: 'metric',
+  },
 };
 
 init();
@@ -51,8 +66,7 @@ function appendIcon(element, icon) {
 
 function appendLine(element, text, withoutBreak) {
   element.appendChild(document.createTextNode(text));
-  if (!withoutBreak)
-    element.appendChild(document.createElement('BR'));
+  if (!withoutBreak) element.appendChild(document.createElement('BR'));
 }
 
 function centerAndZoom(response) {
@@ -70,8 +84,7 @@ function clearLayer() {
 }
 
 function displayPopup(response, location) {
-  if (!tomTom.map.loaded())
-    return;
+  if (!tomTom.map.loaded()) return;
 
   clearPopup();
 
@@ -87,8 +100,7 @@ function displayPopup(response, location) {
 }
 
 function clearPopup() {
-  if (tomTom.popup == null)
-    return;
+  if (tomTom.popup == null) return;
 
   tomTom.popup.remove();
   tomTom.popup = null;
@@ -104,22 +116,23 @@ function findLocation() {
 
   const queryText = getValue(ids.html.location);
 
-  tt.services.fuzzySearch({ key: tomTom.key, query: queryText })
+  tt.services
+    .fuzzySearch({ key: tomTom.key, query: queryText })
     .go()
     .then(centerAndZoom)
-    .catch(function(error) {
-       alert('Could not find location (' + queryText + '). ' + error.message);
-  });
+    .catch(function (error) {
+      alert('Could not find location (' + queryText + '). ' + error.message);
+    });
 }
 
 function formatText(response) {
   const weather = response.weather[0];
-  const tempUnits = openWeatherMap.units == 'imperial' ? '℉' : '℃';
+  const tempUnits = openWeatherMap.units == 'imperial' ? 'F' : 'F';
   const temp = Math.round(response.main.temp);
 
   const outerDiv = document.createElement('DIV');
   outerDiv.classList.add('popup');
-  
+
   appendIcon(outerDiv, weather.icon);
   appendHeading(outerDiv, getName(response));
 
@@ -141,33 +154,33 @@ function formatWind(wind) {
 }
 
 function getCurrentWeatherData(clickEvent) {
-  currentWeatherData( {
+  currentWeatherData({
     appid: openWeatherMap.appid,
     lat: clickEvent.lngLat.lat,
     lon: clickEvent.lngLat.lng,
-    units: openWeatherMap.units
+    units: openWeatherMap.units,
   })
-  .go()
-  .then(function(response) {
-    displayPopup(response, clickEvent.lngLat);
-  })
-  .catch(function(error) {
-    clearPopup();
+    .go()
+    .then(function (response) {
+      displayPopup(response, clickEvent.lngLat);
+    })
+    .catch(function (error) {
+      clearPopup();
 
-    const message = error.hasOwnProperty('message') ? error.message : error;
-    alert('Error: ' + message);
-  });
+      const message = error.hasOwnProperty('message') ? error.message : error;
+      alert('Error: ' + message);
+    });
 }
 
 function getDirection(degrees) {
   const increment = openWeatherMap.maxDegree / openWeatherMap.directions.length;
-  return degrees >= 0 && degrees < openWeatherMap.maxDegree ?
-    openWeatherMap.directions[Math.floor(degrees / increment)] : null;
+  return degrees >= 0 && degrees < openWeatherMap.maxDegree
+    ? openWeatherMap.directions[Math.floor(degrees / increment)]
+    : null;
 }
 
 function getLocation(response) {
-   if (response.results.length > 0)
-     return response.results[0];
+  if (response.results.length > 0) return response.results[0];
 
   alert('Could not find location.');
   return null;
@@ -175,8 +188,9 @@ function getLocation(response) {
 
 function getName(response) {
   const name = response.hasOwnProperty('name') ? response.name : '';
-  return name == null || name == '' ?
-    'lat=' + response.coord.lat + ', lon=' + response.coord.lon : name;
+  return name == null || name == ''
+    ? 'lat=' + response.coord.lat + ', lon=' + response.coord.lon
+    : name;
 }
 
 function getValue(elementId) {
@@ -186,15 +200,15 @@ function getValue(elementId) {
 function init() {
   tt.setProductInfo(application.name, application.version);
 
-  tomTom.map = tt.map({ key: tomTom.key, container: ids.html.map })
+  tomTom.map = tt
+    .map({ key: tomTom.key, container: ids.html.map })
     .on('click', getCurrentWeatherData);
 }
 
 function updateLayer(element) {
   openWeatherMap.layer = element.options[element.selectedIndex].value;
 
-  if (!tomTom.map.loaded())
-    return;
+  if (!tomTom.map.loaded()) return;
 
   clearLayer();
   clearPopup();
@@ -205,24 +219,23 @@ function updateLayer(element) {
 
   tomTom.map.addSource(openWeatherMap.sourceName, {
     type: 'raster',
-    tiles: [ tileUrl ],
+    tiles: [tileUrl],
     tileSize: 256,
     minZoom: 0,
     maxZoom: 12,
-    attribution: openWeatherMap.attribution
+    attribution: openWeatherMap.attribution,
   });
 
   tomTom.map.addLayer({
-    'id': openWeatherMap.layerName,
-    'type': 'raster',
-    'source': openWeatherMap.sourceName,
-    'layout': { 'visibility': 'visible' }
+    id: openWeatherMap.layerName,
+    type: 'raster',
+    source: openWeatherMap.sourceName,
+    layout: { visibility: 'visible' },
   });
 }
 
 function updateUnits(element) {
   openWeatherMap.units = element.value;
 
-  if (tomTom.map.loaded())
-    clearPopup();
+  if (tomTom.map.loaded()) clearPopup();
 }
